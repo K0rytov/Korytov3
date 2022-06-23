@@ -1,0 +1,43 @@
+#include<stdio.h>
+#include<sys/types.h>
+#include<sys/socket.h>
+#include<netdb.h>
+#include<unistd.h>
+#include<resolv.h>
+#include<arpa/inet.h>
+#include<string.h>
+#include<cstdlib>
+int main()
+{
+     struct sockaddr_in sock;
+     int fd;
+     int sd;
+     memset(&sock,0,sizeof(sock));
+     char msg[300];
+     sock.sin_family = PF_INET;
+     sock.sin_port = htons(565);
+     sock.sin_addr.s_addr = 0; //принимаем подключения на все IP
+      if((fd = socket(AF_INET,SOCK_STREAM,0)) == -1 )
+      {
+          fprintf(stderr,"Can't open socket\n");
+      }
+      if ( bind(fd,(sockaddr *)&sock,sizeof(sock)) == -1 )
+      {
+          fprintf(stderr,"Can't bind\n");
+          exit(0);
+      }
+      listen(fd,0x100);
+     sockaddr_in client_addr;
+     int client_addr_size = sizeof (client_addr);
+     while( (sd = accept(fd,(sockaddr*)&client_addr,(socklen_t*)&client_addr_size)) !=-1 )
+     {
+       send(sd,msg,sizeof(msg),0);
+       memset(msg,0,sizeof(msg));
+       recv(fd,msg,sizeof(msg),0);
+       printf("%s\n",msg);
+     }
+     close(fd);
+     close(sd);
+     scanf("%i",&sd);
+     return 0;
+}
